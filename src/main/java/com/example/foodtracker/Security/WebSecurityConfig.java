@@ -12,16 +12,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
@@ -43,14 +36,7 @@ public class WebSecurityConfig {
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/index", true)
                         .permitAll()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
-                        .userInfoEndpoint(userInfo -> userInfo
-                            .userService(oAuth2UserService())
-                        )
                 )
                 .logout((logout) -> logout.permitAll());
 
@@ -64,7 +50,7 @@ public class WebSecurityConfig {
 
     // Custom UserDetailsService for authentication
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+    public UserDetailsService userDetailsService() {
         return email -> {
             User user = userRepository.getUserByEmail(email); // Use UserRepository here
             if (user == null) {
@@ -74,33 +60,8 @@ public class WebSecurityConfig {
             return org.springframework.security.core.userdetails.User.builder()
                     .username(user.getEmail())
                     .password(user.getPassword())
+                    .roles(user.getRole()) // Use the role from the User object
                     .build();
         };
     }
-
-    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService() {
-        return new DefaultOAuth2UserService() {
-            @Override
-            public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-                OAuth2User oauth2User = super.loadUser(userRequest);
-
-                // Extract user details from Google
-                String email = oauth2User.getAttribute("email");
-                String name = oauth2User.getAttribute("name");
-
-                // Save to your User table if not already there
-                User existingUser = userRepository.getUserByEmail(email); // assumes it returns null if not found
-                if (existingUser == null) {
-                    User newUser = new User();
-                    newUser.setEmail(email);
-                    newUser.setName(name);
-                    newUser.setAuthentication("GOOGLE");
-                    userRepository.addUser(newUser);
-                }
-
-                return oauth2User;
-            }
-        };
-    }
 }
-

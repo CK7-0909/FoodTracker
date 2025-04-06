@@ -10,7 +10,6 @@ public class User {
     private String dob;
     private String password;
     private String role;
-    private String Authentication;
 
 
     public User() {}
@@ -68,11 +67,10 @@ public class User {
         this.role = role;
     }
 
-    public String getAuthentication() {
-        return Authentication;
+    // AuthProvider ENUM
+    public enum AuthProvider {
+        LOCAL,
+        GOOGLE
     }
 
-    public void setAuthentication(String authentication) {
-        Authentication = authentication;
-    }
 }

@@ -31,8 +31,8 @@ public class UserRepository {
 
     // add user
     public void addUser(User user) {
-        String sql = "insert into userinfo (name, email, password, authentication) values (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, user.getName(), user.getEmail(), user.getPassword(), user.getAuthentication());
+        String sql = "insert into userinfo (email, password) values (?, ?)";
+        jdbcTemplate.update(sql, user.getEmail(), user.getPassword());
     }
 
     // Method to check if the email format is valid
