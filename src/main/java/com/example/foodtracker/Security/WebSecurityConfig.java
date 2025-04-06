@@ -38,6 +38,8 @@ public class WebSecurityConfig {
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
+                        .usernameParameter("email")
+                        .passwordParameter("password")
                         .defaultSuccessUrl("/index", true)
                         .permitAll()
                 )
@@ -65,11 +67,14 @@ public class WebSecurityConfig {
             if (user == null) {
                 throw new UsernameNotFoundException("User not found");
             }
+            System.out.println("From DB: " + user.getPassword());
+            System.out.println("Raw from form: " + user.getPassword()); // optional
+            System.out.println("Match: " + passwordEncoder.matches(user.getPassword(), user.getPassword()));
+
 
             return org.springframework.security.core.userdetails.User.builder()
                     .username(user.getEmail())
                     .password(user.getPassword())
-                    .roles(user.getRole()) // Use the role from the User object
                     .build();
         };
     }
