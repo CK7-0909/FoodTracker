@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #loadingIndicator {
+            display: none;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <header class="pb-3 mb-4 border-bottom d-flex justify-content-between align-items-center">
+        <h1 class="display-5 fw-bold">Food Tracker</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-outline-danger">Sign Out</button>
+        </form>
+    </header>
+
+    <div class="row mb-4">
+        <!-- Recipe Search Section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Search Recipes</h4>
+                </div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <input type="text" id="recipeQuery" class="form-control" placeholder="Enter recipe or ingredients...">
+                        <button class="btn btn-primary" type="button" id="searchRecipeBtn">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Search Section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Search Products</h4>
+                </div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <input type="text" id="productQuery" class="form-control" placeholder="Enter grocery product...">
+                        <button class="btn btn-success" type="button" id="searchProductBtn">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="text-center my-4">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading results...</p>
+    </div>
+
+    <!-- Results Container -->
+    <div id="resultsContainer" class="mt-4">
+        <!-- Results will be displayed here -->
+    </div>
+
+    <footer class="pt-3 mt-4 text-muted border-top">
+        &copy; 2025 Food Tracker
+    </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Place your custom JavaScript here -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // DOM elements
+        const searchRecipeBtn = document.getElementById('searchRecipeBtn');
+        const searchProductBtn = document.getElementById('searchProductBtn');
+        const recipeQuery = document.getElementById('recipeQuery');
+        const productQuery = document.getElementById('productQuery');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
+        // First, test if API is working
+        fetch('/user/test')
+            .then(response => response.text())
+            .then(data => {
+                console.log('API Test:', data);
+            })
+            .catch(error => {
+                console.error('API Test Error:', error);
+            });
+
+        // Recipe search function
+        searchRecipeBtn.addEventListener('click', function() {
+            const query = recipeQuery.value.trim();
+            if (!query) return;
+
+            // Show loading indicator
+            loadingIndicator.style.display = 'block';
+            resultsContainer.innerHTML = '';
+
+            fetch(`/searchRecipe?query=${encodeURIComponent(query)}&number=10`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading indicator
+                    loadingIndicator.style.display = 'none';
+                    displayRecipeResults(data);
+                })
+                .catch(error => {
+                    loadingIndicator.style.display = 'none';
+                    console.error('Error searching recipes:', error);
+                    resultsContainer.innerHTML = `<div class="alert alert-danger">Error fetching recipes. Please try again.</div>`;
+                });
+        });
+
+        // Product search function
+        searchProductBtn.addEventListener('click', function() {
+            const query = productQuery.value.trim();
+            if (!query) return;
+
+            // Show loading indicator
+            loadingIndicator.style.display = 'block';
+            resultsContainer.innerHTML = '';
+
+            fetch(`/searchProduct?query=${encodeURIComponent(query)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading indicator
+                    loadingIndicator.style.display = 'none';
+                    displayProductResults(data);
+                })
+                .catch(error => {
+                    loadingIndicator.style.display = 'none';
+                    console.error('Error searching products:', error);
+                    resultsContainer.innerHTML = `<div class="alert alert-danger">Error fetching products. Please try again.</div>`;
+                });
+        });
+
+        // Function to display recipe results
+        function displayRecipeResults(data) {
+            if (!data.results || data.results.length === 0) {
+                resultsContainer.innerHTML = `<div class="alert alert-info">No recipes found. Try different keywords.</div>`;
+                return;
+            }
+
+            let html = '<div class="row">';
+
+            data.results.forEach(recipe => {
+                html += `
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="${recipe.image}" class="card-img-top" alt="${recipe.title}">
+                        <div class="card-body">
+                            <h5 class="card-title">${recipe.title}</h5>
+                            <p class="card-text">
+                                <span class="badge bg-success">Ready in ${recipe.readyInMinutes || 'N/A'} min</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            });
+
+            html += '</div>';
+            resultsContainer.innerHTML = html;
+        }
+
+        // Function to display product results
+        function displayProductResults(data) {
+            if (!data.products || data.products.length === 0) {
+                resultsContainer.innerHTML = `<div class="alert alert-info">No products found. Try different keywords.</div>`;
+                return;
+            }
+
+            let html = '<div class="row">';
+
+            data.products.forEach(product => {
+                // Extract protein info if available
+                let proteinInfo = '';
+                if (product.nutrition && product.nutrition.nutrients) {
+                    const protein = product.nutrition.nutrients.find(n => n.name === 'Protein');
+                    if (protein) {
+                        proteinInfo = `<p>Protein: ${protein.amount}${protein.unit}</p>`;
+                    }
+                }
+
+                html += `
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="${product.image}" class="card-img-top" alt="${product.title}">
+                        <div class="card-body">
+                            <h5 class="card-title">${product.title}</h5>
+                            ${proteinInfo}
+                        </div>
+                    </div>
+                </div>
+            `;
+            });
+
+            html += '</div>';
+            resultsContainer.innerHTML = html;
+        }
+    });
+</script>
+</body>
+</html>

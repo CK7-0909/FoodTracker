@@ -1,5 +1,6 @@
 package com.example.foodtracker.user;
 
+
 public class User {
 
 
@@ -7,6 +8,10 @@ public class User {
     private String name;
     private String email;
     private String dob;
+    private String password;
+    private String role;
+    private String authentication;
+
 
     public User() {}
     public User(long id, String name, String email, String dob) {
@@ -47,6 +52,34 @@ public class User {
     public String getEmail() {
         return email;
     }
+    public String getPassword() {
+        return password;
+    }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(String authentication) {
+        this.authentication = authentication;
+    }
+
+    // AuthProvider ENUM
+    public enum AuthProvider {
+        LOCAL,
+        GOOGLE
+    }
 
 }
