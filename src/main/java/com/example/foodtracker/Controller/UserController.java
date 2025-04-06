@@ -2,12 +2,14 @@ package com.example.foodtracker.Controller;
 
 import com.example.foodtracker.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.example.foodtracker.user.User;
 
 import java.util.Map;
 
-@RestController
+@Controller
 // @RequestMapping("/user")
 public class UserController {
 
@@ -23,13 +25,14 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestParam String email, @RequestParam String password) {
+    public String registerUser(@RequestParam String name, @RequestParam String email, @RequestParam String password, Model model) {
         try {
-            userService.registerUser(email, password);
+            userService.registerUser(name, email, password);
             return "redirect:/login";  // Redirect to login page after successful registration
         } catch (IllegalArgumentException e) {
             // If user already exists or email is invalid
-            return "redirect:/register";  // You can redirect with an error message
+            model.addAttribute("error", e.getMessage());
+            return "register";  // You can redirect with an error message
         }
     }
 

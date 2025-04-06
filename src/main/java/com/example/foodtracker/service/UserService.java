@@ -25,7 +25,7 @@ public class UserService {
     }
 
     // For user registration
-    public void registerUser(String email, String password) {
+    public void registerUser(String name, String email, String password) {
         if (userRepository.getUserByEmail(email) != null) {
             throw new IllegalArgumentException("User with email " + email + " already exists");
         }
@@ -33,8 +33,10 @@ public class UserService {
             throw new IllegalArgumentException("Invalid email");
         }
         User user = new User();
+        user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setAuthentication("LOCAL");
         userRepository.addUser(user);
     }
 
