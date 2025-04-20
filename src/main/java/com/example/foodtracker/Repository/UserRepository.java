@@ -1,13 +1,12 @@
 package com.example.foodtracker.Repository;
 
-import com.example.foodtracker.user.User;
+import com.example.foodtracker.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
 import java.util.regex.Pattern;
 
 @Repository

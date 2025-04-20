@@ -1,25 +1,20 @@
 package com.example.foodtracker.service;
 
-import com.example.foodtracker.API.SpoonacularAPI;
 import com.example.foodtracker.Repository.UserRepository;
+import com.example.foodtracker.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.example.foodtracker.user.User;
-
-import java.util.Map;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
-    private final SpoonacularAPI spoonacularAPI;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(SpoonacularAPI spoonacularAPI, UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.spoonacularAPI = spoonacularAPI;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -42,9 +37,10 @@ public class UserService {
         try {
             User userData = userRepository.getUserByEmail(email);
             User user = new User();
-            user.setName(user.getName());
-            user.setEmail(user.getEmail());
-            user.setPassword(user.getPassword());
+            user.setId(userData.getId());
+            user.setName(userData.getName());
+            user.setEmail(userData.getEmail());
+            user.setPassword(userData.getPassword());
             user.setRole(userData.getRole());
             return user;
 
@@ -53,13 +49,4 @@ public class UserService {
             return null; // Or throw a custom exception
         }
     }
-
-    public Map<String, Object> searchRecipes(String query, int number) {
-        return spoonacularAPI.searchRecipes(query, number);
-    }
-
-    public Map<String, Object> searchProducts(String query) {
-        return spoonacularAPI.searchProduct(query);
-    }
-
 }

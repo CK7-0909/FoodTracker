@@ -1,8 +1,7 @@
-package com.example.foodtracker.user;
+package com.example.foodtracker.domain;
 
 
 public class User {
-
 
     private long id;
     private String name;
@@ -14,11 +13,13 @@ public class User {
 
 
     public User() {}
-    public User(long id, String name, String email, String dob) {
+
+    public User(long id, String name, String email, String password, String role) {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.dob = dob;
+        this.password = password;
+        this.role = role;
     }
 
     public void setId(long id) {
@@ -74,12 +75,6 @@ public class User {
 
     public void setAuthentication(String authentication) {
         this.authentication = authentication;
-    }
-
-    // AuthProvider ENUM
-    public enum AuthProvider {
-        LOCAL,
-        GOOGLE
     }
 
 }

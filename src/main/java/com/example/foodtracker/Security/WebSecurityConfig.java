@@ -1,7 +1,7 @@
 package com.example.foodtracker.Security;
 
 import com.example.foodtracker.Repository.UserRepository;
-import com.example.foodtracker.user.User;
+import com.example.foodtracker.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,9 +32,11 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/", "/about", "/register").permitAll()
                         .anyRequest().authenticated()
+//                        .anyRequest().permitAll() // Comment to enable security
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
@@ -48,6 +50,7 @@ public class WebSecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(oAuth2UserService())
                         )
+                        .defaultSuccessUrl("/index", true)
                 )
                 .logout((logout) -> logout.permitAll());
 
@@ -67,15 +70,11 @@ public class WebSecurityConfig {
             if (user == null) {
                 throw new UsernameNotFoundException("User not found");
             }
-            System.out.println("From DB: " + user.getPassword());
-            System.out.println("Raw from form: " + user.getPassword()); // optional
-            System.out.println("Match: " + passwordEncoder.matches(user.getPassword(), user.getPassword()));
-
-
             return org.springframework.security.core.userdetails.User.builder()
                     .username(user.getEmail())
                     .password(user.getPassword())
                     .build();
+
         };
     }
 
