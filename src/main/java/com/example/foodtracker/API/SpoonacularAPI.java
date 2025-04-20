@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Component
 public class SpoonacularAPI {
@@ -24,10 +23,10 @@ public class SpoonacularAPI {
         return restTemplate.getForObject(url, Map.class);
     }
 
-    public Map<String, Object> searchProduct(String query) {
-        String endpoint = "/food/products/search";
-        String url = baseUrl + endpoint + "?apiKey=" + apiKey + "&query=" + query;
-        return restTemplate.getForObject(url, Map.class);
-    }
+//    public Map<String, Object> searchProduct(String query) {
+//        String endpoint = "/food/products/search";
+//        String url = baseUrl + endpoint + "?apiKey=" + apiKey + "&query=" + query;
+//        return restTemplate.getForObject(url, Map.class);
+//    }
 
 }
