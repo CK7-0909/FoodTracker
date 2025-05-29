@@ -3,6 +3,7 @@ package com.example.foodtracker.Security;
 import com.example.foodtracker.Repository.UserRepository;
 import com.example.foodtracker.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,9 +35,10 @@ public class WebSecurityConfig {
         http
 
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "/about", "/register").permitAll()
+                                .requestMatchers("/", "/about", "/register", "/login").permitAll()
+                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .anyRequest().authenticated()
-//                        .anyRequest().permitAll() // Comment to enable security
+//                        .anyRequest().permitAll() // Comment to disable security
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")

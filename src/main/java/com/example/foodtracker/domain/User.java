@@ -3,7 +3,7 @@ package com.example.foodtracker.domain;
 
 public class User {
 
-    private long id;
+    private int id;
     private String name;
     private String email;
     private String dob;
@@ -14,7 +14,7 @@ public class User {
 
     public User() {}
 
-    public User(long id, String name, String email, String password, String role) {
+    public User(int id, String name, String email, String password, String role) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -22,8 +22,8 @@ public class User {
         this.role = role;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public int getId() {
+        return id;
     }
 
     public void setName(String name) {
@@ -38,8 +38,8 @@ public class User {
         this.dob = dob;
     }
 
-    public long getId() {
-        return id;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
