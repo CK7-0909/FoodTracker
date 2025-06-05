@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Repository
@@ -19,10 +20,11 @@ public class UserRepository {
     }
 
     // for login validation
-    public User getUserByEmail(String email) {
+    public Optional<User> getUserByEmail(String email) {
         try {
             String sql = "SELECT * FROM userinfo WHERE email = ?";
-            return jdbcTemplate.queryForObject(sql, new Object[]{email}, new BeanPropertyRowMapper<>(User.class));
+            User user = jdbcTemplate.queryForObject(sql, new Object[]{email}, new BeanPropertyRowMapper<>(User.class));
+            return Optional.of(user);
         } catch (EmptyResultDataAccessException e) {
             return null;  // Return null if no user found
         }

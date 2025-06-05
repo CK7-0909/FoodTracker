@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <!-- CSRF -->
+    <meta name="_csrf" th:attr="content=${_csrf.token}"/>
+    <meta name="_csrf_header" th:attr="content=${_csrf.headerName}"/>
+
+    <title>Food Tracker - Fat Search</title>
+
+    <!-- BOOTSTRAP CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+          rel="stylesheet"/>
+    <style>
+        .card:hover {
+            transform: translateY(-5px);
+            transition: .3s;
+        }
+
+        .clickable {
+            cursor: pointer;
+        }
+
+        #spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        #fatResult .card {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<!-- include your navbar fragment here -->
+<div th:replace="fragments/header :: siteHeader"></div>
+
+<div class="container py-4">
+    <header class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5">Food Tracker</h1>
+        <form th:action="@{/logout}" method="post">
+            <button class="btn btn-outline-danger">Sign Out</button>
+        </form>
+    </header>
+
+    <!-- Search bar -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input class="form-control" id="fatQuery" placeholder="Search fats…">
+                <button class="btn btn-primary" id="searchFatBtn" type="button">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results + Details -->
+    <div class="row">
+        <!-- Listing Column -->
+        <div class="col-md-6">
+            <h4>Fat Results</h4>
+            <div id="fatResult">
+                <p class="text-muted">Enter a query and click Search to see fat items.</p>
+            </div>
+        </div>
+        <!-- Details Column -->
+        <div class="col-md-6">
+            <h4>Nutrition Details</h4>
+            <div id="fatDetails">
+                <p class="text-muted">Click a fat item to view detailed nutrients and add to a meal.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add-to-meal Modal -->
+    <div class="modal fade" id="mealModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" id="mealForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add to Meal</h5>
+                    <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="mealFoodId" name="foodId" type="hidden">
+                    <div class="form-check"><input checked class="form-check-input" id="mealBreakfast"
+                                                   name="mealType" type="radio" value="BREAKFAST"><label
+                            class="form-check-label" for="mealBreakfast">Breakfast</label></div>
+                    <div class="form-check"><input class="form-check-input" id="mealLunch" name="mealType" type="radio"
+                                                   value="LUNCH"><label class="form-check-label"
+                                                                         for="mealLunch">Lunch</label></div>
+                    <div class="form-check"><input class="form-check-input" id="mealDinner" name="mealType" type="radio"
+                                                   value="DINNER"><label class="form-check-label" for="mealDinner">Dinner</label>
+                    </div>
+                    <div class="form-check"><input class="form-check-input" id="mealSnack" name="mealType" type="radio"
+                                                   value="SNACK"><label class="form-check-label"
+                                                                         for="mealSnack">Snack</label></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="mt-5 text-center text-muted">&copy; 2025 Food Tracker</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const fatQuery = document.getElementById('fatQuery');
+        const searchBtn = document.getElementById('searchFatBtn');
+        const resultDiv = document.getElementById('fatResult');
+        const detailsDiv = document.getElementById('fatDetails');
+        const FALLBACK_IMG = 'https://via.placeholder.com/150?text=No+Image';
+        const modal = new bootstrap.Modal(document.getElementById('mealModal'));
+        const mealForm = document.getElementById('mealForm');
+        const mealFoodId = document.getElementById('mealFoodId');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+
+        searchBtn.onclick = () => {
+            const term = fatQuery.value.trim();
+            if (!term) return;
+            resultDiv.innerHTML = '<div id="spinner"><div class="spinner-border text-primary" role="status"></div></div>';
+            detailsDiv.innerHTML = '';
+
+            fetch(`/searchFat?query=${encodeURIComponent(term)}`)
+                .then(res => res.json())
+                .then(data => {
+                    const items = data.foods?.food || [];
+                    if (!items.length) {
+                        resultDiv.innerHTML = '<div class="alert alert-info">No fats found.</div>';
+                        return;
+                    }
+                    // Render list cards
+                    resultDiv.innerHTML = items.map(item => {
+                        return `
+                            <div class="card mb-2 clickable" data-id="${item.food_id}">
+                              <div class="card-body d-flex align-items-center">
+                                <img src="${item.food_photos?.photo?.[0]?.thumb || FALLBACK_IMG}" onerror="this.src='${FALLBACK_IMG}'" alt="${item.food_name}" style="width:50px;height:50px;object-fit:contain;" class="me-3">
+                                <div>
+                                  <h6 class="mb-0">${item.food_name}</h6>
+                                  <small class="text-muted">${item.brand_name || item.food_type}</small>
+                                </div>
+                              </div>
+                            </div>`;
+                    }).join('');
+
+                    // Attach click handlers
+                    document.querySelectorAll('.clickable').forEach(el => {
+                        el.onclick = () => loadDetails(el.dataset.id);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
+                });
+        };
+
+        function loadDetails(foodId) {
+            detailsDiv.innerHTML = `<div id="spinner"><div class="spinner-border text-primary" role="status"></div></div>`;
+
+            fetch(`/getFatNutrition?foodId=${encodeURIComponent(foodId)}`)
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then(data => {
+                    const food = data.food;
+                    let s = food.servings.serving;
+
+                    // ① If it's an array, pick the first serving
+                    if (Array.isArray(s)) {
+                        s = s[0];
+                    }
+                    // now `s` is guaranteed to be an object with nutrients
+
+                    // ② Build your nutrient rows
+                    const rows = [
+                        ['Calories', s.calories + ' kcal'],
+                        ['Fat', s.fat + ' g'],
+                        ['Saturated Fat', s.saturated_fat + ' g'],
+                        ['Trans Fat', s.trans_fat + ' g'],
+                        ['Carbs', s.carbohydrate + ' g'],
+                        ['Fiber', s.fiber + ' g'],
+                        ['Protein', s.protein + ' g'],
+                        ['Cholesterol', s.cholesterol + ' mg'],
+                        ['Sodium', s.sodium + ' mg'],
+                        ['Sugar', s.sugar + ' g']
+                    ].map(([nutrient, value]) =>
+                        `<tr><td>${nutrient}</td><td>${value}</td></tr>`
+                    ).join('');
+
+                    // ③ Render the details
+                    detailsDiv.innerHTML = `
+                        <div class="card">
+                          <div class="card-body">
+                            <h3 class="card-title">${food.food_name}</h3>
+                            <h6 class="card-title">${food.brand_name}</h6>
+                            <p><strong>Serving:</strong> ${s.serving_description} (${s.metric_serving_amount} ${s.metric_serving_unit})</p>
+                            <div class="table-responsive">
+                              <table class="table table-sm"><tbody>${rows}</tbody></table>
+                            </div>
+                            <button id="addMealBtn" class="btn btn-primary mt-2">
+                              Add to Meal
+                            </button>
+                          </div>
+                        </div>`;
+
+                    // ④ Wire up the modal
+                    document.getElementById('addMealBtn').onclick = () => {
+                        mealFoodId.value = food.food_id;
+                        modal.show();
+                    };
+                })
+                .catch(err => {
+                    console.error(err);
+                    detailsDiv.innerHTML = `<div class="alert alert-danger">
+        Error loading details: ${err.message}
+      </div>`;
+                });
+        }
+
+        mealForm.onsubmit = e => {
+            e.preventDefault();
+            const payload = {foodId: mealFoodId.value, mealType: mealForm.mealType.value};
+            fetch('/api/log', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {'Content-Type': 'application/json', [csrfHeader]: csrfToken},
+                body: JSON.stringify(payload)
+            })
+                .then(r => r.json())
+                .then(() => {
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-success';
+                    alert.textContent = 'Added to meal!';
+                    mealForm.prepend(alert);
+                    setTimeout(() => alert.remove(), 3000);
+                    modal.hide();
+                })
+                .catch(err => {
+                    console.error(err);
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-danger';
+                    alert.textContent = 'Failed to add.';
+                    mealForm.prepend(alert);
+                });
+        };
+    });
+</script>
+</body>
+</html>
