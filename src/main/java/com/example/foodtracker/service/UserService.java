@@ -24,7 +24,7 @@ public class UserService {
 
     // For user registration
     public void registerUser(String email, String password) {
-        if (userRepository.getUserByEmail(email) != null) {
+        if (userRepository.getUserByEmail(email).isPresent()) {
             throw new IllegalArgumentException("User with email " + email + " already exists");
         }
         if (!userRepository.isValidEmail(email)) {

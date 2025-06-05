@@ -93,12 +93,12 @@ public class FoodController {
     }
 
     @GetMapping("/logsRetrieve")
-    public ResponseEntity<Map<String, Object>> getRetrieval(Authentication auth) {
+    public ResponseEntity<List<FoodLog>> getRetrieval(Authentication auth) {
         User user = userRepository.getUserByEmail(auth.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("No User"));
         List<FoodLog> foodLogs = foodLogService.getFoodLogs(user.getId());
         //System.out.println(foodLogs);
-        return ResponseEntity.ok(Map.of("foodLogs", foodLogs));
+        return ResponseEntity.ok(foodLogs);
     }
 }
 

@@ -18,7 +18,7 @@
 <body>
 
 <!-- navbar fragment -->
-<div th:replace="fragments/header :: siteHeader"></div>
+<div th:replace="~{fragments/header :: siteHeader}"></div>
 
 <main class="container py-4">
     <h1>My Food Logs</h1>
@@ -57,11 +57,12 @@
                       <th>Date</th>
                       <th>Meal</th>
                       <th>Brand/Food</th>
-                      <th>Serving</th>
+                      <th>Servings</th>
+                      <th>Mass</th>
                       <th>Calories</th>
                       <th>Fat</th>
-                      <th>Sat. Fat</th>
-                      <th>Trans Fat</th>
+                      <th>Sat._Fat</th>
+                      <th>Trans_Fat</th>
                       <th>Carbs</th>
                       <th>Fiber</th>
                       <th>Protein</th>
@@ -79,17 +80,18 @@
                 <td>${new Date(log.loggedAt).toLocaleString()}</td>
                 <td>${log.mealType}</td>
                 <td>${log.brandName}</td>
-                <td>${log.servingSize} × ${log.servings}</td>
-                <td>${log.calories}</td>
-                <td>${log.fat}</td>
-                <td>${log.saturatedFat}</td>
-                <td>${log.transFat}</td>
-                <td>${log.carbs}</td>
-                <td>${log.fiber}</td>
-                <td>${log.protein}</td>
-                <td>${log.cholesterol}</td>
-                <td>${log.sodium}</td>
-                <td>${log.sugar}</td>
+                <td>${log.servingSize} g</td>
+                <td>${log.servings}</td>
+                <td>${log.calories} kcal</td>
+                <td>${log.fat} g</td>
+                <td>${log.saturatedFat} g</td>
+                <td>${log.transFat} g</td>
+                <td>${log.carbs} g</td>
+                <td>${log.fiber} g</td>
+                <td>${log.protein} g</td>
+                <td>${log.cholesterol} mg</td>
+                <td>${log.sodium} mg</td>
+                <td>${log.sugar} g</td>
               </tr>
             `;
                 });

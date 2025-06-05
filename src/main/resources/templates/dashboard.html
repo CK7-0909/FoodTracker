@@ -17,9 +17,51 @@
 <main class="container py-4">
     <h1>Dashboard</h1>
 
+    <div class="mb-3">
+        <label class="form-label" for="periodSelect">Period</label>
+        <select class="form-select" id="periodSelect" style="width:auto;">
+            <option value="day">Day</option>
+            <option selected value="week">Week</option>
+            <option value="month">Month</option>
+        </select>
+    </div>
+    <div id="chartWrapper" style="width: 300px; height: 300px;">
+        <canvas id="macroChart"></canvas>
+    </div>
 </main>
 
 <!-- BOOTSTRAP JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('macroChart').getContext('2d');
+        let chart;
+        const select = document.getElementById('periodSelect');
+
+        function loadData() {
+            fetch(`/macroSummary?period=${select.value}`)
+                .then(r => r.json())
+                .then(data => {
+                    const values = [data.protein || 0, data.carbs || 0, data.fat || 0];
+                    const config = {
+                        type: 'pie',
+                        data: {
+                            labels: ['Protein', 'Carbs', 'Fat'],
+                            datasets: [{data: values, backgroundColor: ['#0d6efd', '#198754', '#dc3545']}]
+                        }
+                    };
+                    if (chart) {
+                        chart.destroy();
+                    }
+                    chart = new Chart(ctx, config);
+                })
+                .catch(err => console.error(err));
+        }
+
+        select.addEventListener('change', loadData);
+        loadData();
+    });
+</script>
 </body>
 </html>
