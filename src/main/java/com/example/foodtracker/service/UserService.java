@@ -4,8 +4,11 @@ import com.example.foodtracker.Repository.UserRepository;
 import com.example.foodtracker.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -35,7 +38,8 @@ public class UserService {
 
     public User getUserByEmail(String email) {
         try {
-            User userData = userRepository.getUserByEmail(email);
+            Optional<User> userDetail = userRepository.getUserByEmail(email);
+            User userData = userDetail.orElseThrow(() -> new UsernameNotFoundException(email));
             User user = new User();
             user.setId(userData.getId());
             user.setName(userData.getName());

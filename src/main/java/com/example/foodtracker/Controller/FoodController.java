@@ -1,17 +1,21 @@
 package com.example.foodtracker.Controller;
 
 import com.example.foodtracker.Repository.UserRepository;
+import com.example.foodtracker.domain.FoodLog;
 import com.example.foodtracker.domain.User;
 import com.example.foodtracker.service.FoodLogService;
 import com.example.foodtracker.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class FoodController {
@@ -67,13 +71,15 @@ public class FoodController {
         String username = principal.getName();   // "test4@gmail.com"
 
         // 2) Look up your domain User via the injected repository instance
-        User userDetails = userRepository
+        Optional<User> userDetails = userRepository
                 .getUserByEmail(username);
-        if (userDetails == null) {
+        if (userDetails.isEmpty()) {
             throw new UsernameNotFoundException(username);
         }
+        User user = userDetails
+                .orElseThrow(() -> new UsernameNotFoundException(username));
 
-        int userId = userDetails.getId();       // now non-null
+        int userId = user.getId();
 
         // 3) Parse the payload
         int foodId = Integer.parseInt(payload.get("foodId").toString());
@@ -84,6 +90,15 @@ public class FoodController {
 
         // 5) Return 200 OK
         return ResponseEntity.ok(Map.of("status", "success"));
+    }
+
+    @GetMapping("/logsRetrieve")
+    public ResponseEntity<Map<String, Object>> getRetrieval(Authentication auth) {
+        User user = userRepository.getUserByEmail(auth.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("No User"));
+        List<FoodLog> foodLogs = foodLogService.getFoodLogs(user.getId());
+        //System.out.println(foodLogs);
+        return ResponseEntity.ok(Map.of("foodLogs", foodLogs));
     }
 }
 

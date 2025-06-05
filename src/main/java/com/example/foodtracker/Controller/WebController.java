@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class WebController {
 
-    @GetMapping({"/About", "/"})
+    @GetMapping({"/about"})
     public String About() {
-        return "About";
+        return "about";
     }
 
     @GetMapping("/login")
@@ -24,5 +24,20 @@ public class WebController {
     @GetMapping("/index")
     public String Index() {
         return "index";
+    }
+
+    @GetMapping("/error")
+    public String Error() {
+        return "error";
+    }
+
+    @GetMapping("/dashboard")
+    public String Dashboard() {
+        return "dashboard";
+    }
+
+    @GetMapping("/logRetrieval")
+    public String LogRetrieval() {
+        return "logRetrieval";
     }
 }

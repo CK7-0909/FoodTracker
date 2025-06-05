@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.Optional;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
@@ -35,7 +37,7 @@ public class WebSecurityConfig {
         http
 
                 .authorizeHttpRequests((requests) -> requests
-                                .requestMatchers("/", "/about", "/register", "/login").permitAll()
+                                .requestMatchers("/about", "/register", "/login", "/error").permitAll()
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .anyRequest().authenticated()
 //                        .anyRequest().permitAll() // Comment to disable security
@@ -44,7 +46,7 @@ public class WebSecurityConfig {
                         .loginPage("/login")
                         .usernameParameter("email")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/index", true)
+                        .defaultSuccessUrl("/dashboard", true)
                         .permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -68,10 +70,12 @@ public class WebSecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         return email -> {
-            User user = userRepository.getUserByEmail(email); // Use UserRepository here
-            if (user == null) {
+            Optional<User> userDetail = userRepository.getUserByEmail(email); // Use UserRepository here
+            if (userDetail.isEmpty()) {
                 throw new UsernameNotFoundException("User not found");
             }
+            User user = userDetail
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             return org.springframework.security.core.userdetails.User.builder()
                     .username(user.getEmail())
                     .password(user.getPassword())
@@ -91,8 +95,8 @@ public class WebSecurityConfig {
                 String name = oauth2User.getAttribute("name");
 
                 // Save to your User table if not already there
-                User existingUser = userRepository.getUserByEmail(email); // assumes it returns null if not found
-                if (existingUser == null) {
+                Optional<User> existingUser = userRepository.getUserByEmail(email); // assumes it returns null if not found
+                if (existingUser.isEmpty()) {
                     User newUser = new User();
                     newUser.setEmail(email);
                     newUser.setName(name);
