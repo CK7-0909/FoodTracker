@@ -1,6 +1,7 @@
 package com.example.foodtracker.Repository;
 
 import com.example.foodtracker.domain.FoodLog;
+import com.example.foodtracker.dto.MacroHistoryDto;
 import com.example.foodtracker.dto.MacroSummaryDto;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -71,6 +72,27 @@ public class FoodLogRepository {
         return jdbcTemplate.queryForObject(
                 sql,
                 new BeanPropertyRowMapper<>(MacroSummaryDto.class),
+                userId,
+                start,
+                end
+        );
+    }
+
+    public List<MacroHistoryDto> getMacroHistory(long userId, LocalDateTime start, LocalDateTime end) {
+        String sql = """
+                SELECT DATE(logged_at) AS day,
+                       COALESCE(SUM(protein), 0) AS protein,
+                       COALESCE(SUM(carbs), 0) AS carbs,
+                       COALESCE(SUM(fat), 0) AS fat
+                FROM foodlog
+                WHERE user_id = ? AND logged_at >= ? AND logged_at < ?
+                GROUP BY DATE(logged_at)
+                ORDER BY DATE(logged_at)
+                """;
+
+        return jdbcTemplate.query(
+                sql,
+                new BeanPropertyRowMapper<>(MacroHistoryDto.class),
                 userId,
                 start,
                 end

@@ -17,16 +17,56 @@
 <main class="container py-4">
     <h1>Dashboard</h1>
 
-    <div class="mb-3">
-        <label class="form-label" for="periodSelect">Period</label>
-        <select class="form-select" id="periodSelect" style="width:auto;">
-            <option value="day">Day</option>
-            <option selected value="week">Week</option>
-            <option value="month">Month</option>
-        </select>
+    <div class="mb-3 d-flex gap-3">
+        <div>
+            <label class="form-label" for="startDate">Start Date</label>
+            <input class="form-control" id="startDate" type="date"/>
+        </div>
+        <div>
+            <label class="form-label" for="endDate">End Date</label>
+            <input class="form-control" id="endDate" type="date"/>
+        </div>
+        <!-- Macro PIE -->
+        <div class="container">
+            <div class="row">
+                <!-- Pie chart column -->
+                <div class="col-md-6 d-flex justify-content-center align-items-center">
+                    <div id="chartWrapper" style="width: 300px; height: 300px;">
+                        <canvas id="macroChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Table column -->
+                <div class="col-md-6">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Macro</th>
+                            <th>Amount (g)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Protein</td>
+                            <td id="tblProtein">0</td>
+                        </tr>
+                        <tr>
+                            <td>Carbs</td>
+                            <td id="tblCarbs">0</td>
+                        </tr>
+                        <tr>
+                            <td>Fat</td>
+                            <td id="tblFat">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="chartWrapper" style="width: 300px; height: 300px;">
-        <canvas id="macroChart"></canvas>
+    <!-- Macro totals -->
+    <div id="historyWrapper" style="width: 300px; height: 300px;">
+        <canvas id="historyChart"></canvas>
     </div>
 </main>
 
@@ -36,11 +76,13 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const ctx = document.getElementById('macroChart').getContext('2d');
+        const ctxHistory = document.getElementById('historyChart').getContext('2d');
         let chart;
+        let historyChart;
         const select = document.getElementById('periodSelect');
 
         function loadData() {
-            fetch(`/macroSummary?period=${select.value}`)
+            fetch(`/macroSummaryChart?period=${select.value}`)
                 .then(r => r.json())
                 .then(data => {
                     const values = [data.protein || 0, data.carbs || 0, data.fat || 0];
@@ -55,6 +97,54 @@
                         chart.destroy();
                     }
                     chart = new Chart(ctx, config);
+
+                    // 2) Populate macro table
+                    document.getElementById('tblProtein').textContent = protein;
+                    document.getElementById('tblCarbs').textContent = carbs;
+                    document.getElementById('tblFat').textContent = fat;
+                })
+                .catch(err => console.error(err));
+
+            fetch(`/macroSummaryChart?period=${select.value}`)
+                .then(r => r.json())
+                .then(data => {
+                    const values = [data.protein || 0, data.carbs || 0, data.fat || 0];
+                    const config = {
+                        type: 'pie',
+                        data: {
+                            labels: ['Protein', 'Carbs', 'Fat'],
+                            datasets: [{data: values, backgroundColor: ['#0d6efd', '#198754', '#dc3545']}]
+                        }
+                    };
+                    if (chart) {
+                        chart.destroy();
+                    }
+                    chart = new Chart(ctx, config);
+                })
+                .catch(err => console.error(err));
+
+            fetch(`/macroHistory?period=${select.value}`)
+                .then(r => r.json())
+                .then(data => {
+                    const labels = data.map(d => d.day);
+                    const prot = data.map(d => d.protein || 0);
+                    const carbs = data.map(d => d.carbs || 0);
+                    const fat = data.map(d => d.fat || 0);
+                    const config = {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {label: 'Protein', data: prot, backgroundColor: '#0d6efd'},
+                                {label: 'Carbs', data: carbs, backgroundColor: '#198754'},
+                                {label: 'Fat', data: fat, backgroundColor: '#dc3545'}
+                            ]
+                        }
+                    };
+                    if (historyChart) {
+                        historyChart.destroy();
+                    }
+                    historyChart = new Chart(ctxHistory, config);
                 })
                 .catch(err => console.error(err));
         }

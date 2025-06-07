@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+
 @RestController
 public class DashController {
 
@@ -22,12 +24,27 @@ public class DashController {
         this.dashboardService = dashboardService;
     }
 
-    @GetMapping("/macroSummary")
-    public ResponseEntity<MacroSummaryDto> macroSummary(@RequestParam(defaultValue = "day") String period,
+    @GetMapping("/macroSummaryChart")
+    public ResponseEntity<MacroSummaryDto> macroSummary(@RequestParam(required = false) String start,
+                                                        @RequestParam(required = false) String end,
                                                         Authentication auth) {
         User user = userRepository.getUserByEmail(auth.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("No User"));
-        MacroSummaryDto summary = dashboardService.getMacroSummary(user.getId(), period);
+        LocalDate startDate = start != null ? LocalDate.parse(start) : LocalDate.now();
+        LocalDate endDate = end != null ? LocalDate.parse(end) : LocalDate.now();
+        MacroSummaryDto summary = dashboardService.getMacroSummary(user.getId(), startDate, endDate);
         return ResponseEntity.ok(summary);
     }
+
+//    @GetMapping("/macroSummaryChartTable")
+//    public ResponseEntity<List<MacroHistoryDto>> macroHistory(@RequestParam(required = false) String start,
+//                                                              @RequestParam(required = false) String end,
+//                                                              Authentication auth) throws JsonProcessingException {
+//        User user = userRepository.getUserByEmail(auth.getName())
+//                .orElseThrow(() -> new UsernameNotFoundException("No User"));
+//        LocalDate startDate = start != null ? LocalDate.parse(start): LocalDate.now();
+//        LocalDate endDate = end != null ? LocalDate.parse(end): LocalDate.now();
+//        List<MacroHistoryDto> history = dashboardService.getMacroSummary(user.getId(), startDate, endDate);
+//        return ResponseEntity.ok(history);
+//    }
 }
