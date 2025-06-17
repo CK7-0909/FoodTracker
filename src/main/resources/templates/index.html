@@ -7,41 +7,40 @@
     <meta name="_csrf" th:attr="content=${_csrf.token}"/>
     <meta name="_csrf_header" th:attr="content=${_csrf.headerName}"/>
 
-    <title>Food Tracker - Fat Search</title>
+    <title>Food Tracker – Fat Search</title>
 
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
           rel="stylesheet"/>
+
     <style>
         .card:hover {
             transform: translateY(-5px);
             transition: .3s;
         }
-
         .clickable {
             cursor: pointer;
         }
-
         #spinner {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100px;
         }
-
         #fatResult .card {
             cursor: pointer;
         }
-
         /* sticky & scrollable detail panel */
         #fatDetails {
             position: sticky;
-            top: 100px;
+            top: 100px; /* adjust if your header is taller */
             max-height: calc(100vh - 120px);
             overflow-y: auto;
         }
     </style>
 </head>
 <body>
+<!-- Navbar fragment -->
 <div th:replace="fragments/header :: siteHeader"></div>
 
 <div class="container py-4">
@@ -64,14 +63,14 @@
 
     <!-- Results + Details -->
     <div class="row">
-        <!-- Listing Column -->
+        <!-- Results column -->
         <div class="col-md-6">
             <h4>Fat Results</h4>
             <div id="fatResult">
                 <p class="text-muted">Enter a query and click Search to see fat items.</p>
             </div>
         </div>
-        <!-- Details Column -->
+        <!-- Details column -->
         <div class="col-md-6">
             <h4>Nutrition Details</h4>
             <div id="fatDetails">
@@ -80,11 +79,40 @@
         </div>
     </div>
 
-    <!-- Add-to-meal Modal (unchanged) -->
+    <!-- Add-to-meal Modal -->
     <div class="modal fade" id="mealModal" tabindex="-1">
         <div class="modal-dialog">
             <form class="modal-content" id="mealForm">
-                <!-- …your modal fields… -->
+                <div class="modal-header">
+                    <h5 class="modal-title">Add to Meal</h5>
+                    <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="mealFoodId" name="foodId" type="hidden">
+                    <div class="form-check">
+                        <input checked class="form-check-input" id="mealBreakfast"
+                               name="mealType" type="radio" value="BREAKFAST">
+                        <label class="form-check-label" for="mealBreakfast">Breakfast</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" id="mealLunch"
+                               name="mealType" type="radio" value="LUNCH">
+                        <label class="form-check-label" for="mealLunch">Lunch</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" id="mealDinner"
+                               name="mealType" type="radio" value="DINNER">
+                        <label class="form-check-label" for="mealDinner">Dinner</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" id="mealSnack"
+                               name="mealType" type="radio" value="SNACK">
+                        <label class="form-check-label" for="mealSnack">Snack</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit">Add</button>
+                </div>
             </form>
         </div>
     </div>
@@ -92,6 +120,7 @@
     <footer class="mt-5 text-center text-muted">&copy; 2025 Food Tracker</footer>
 </div>
 
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -106,7 +135,7 @@
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
         const csrfToken = document.querySelector('meta[name="_csrf"]').content;
 
-        // 1) Render search results *without* images
+        // Search and render cards without images
         searchBtn.onclick = () => {
             const term = fatQuery.value.trim();
             if (!term) return;
@@ -122,15 +151,15 @@
                         return;
                     }
                     resultDiv.innerHTML = items.map(item => `
-          <div class="card mb-2 clickable" data-id="${item.food_id}">
-            <div class="card-body">
-              <h6 class="mb-0">${item.food_name}</h6>
-              <small class="text-muted">${item.brand_name || item.food_type}</small>
+            <div class="card mb-2 clickable" data-id="${item.food_id}">
+              <div class="card-body">
+                <h6 class="mb-0">${item.food_name}</h6>
+                <small class="text-muted">${item.brand_name || item.food_type}</small>
+              </div>
             </div>
-          </div>
-        `).join('');
+          `).join('');
 
-                    // 2) Wire up clicks (no img here)
+                    // Attach click handlers
                     document.querySelectorAll('.clickable').forEach(el => {
                         el.onclick = () => loadDetails(el.dataset.id);
                     });
@@ -141,7 +170,7 @@
                 });
         };
 
-        // 3) Fetch details *and* show the image atop the nutrient card
+        // Fetch details and render with image atop nutrient card
         function loadDetails(foodId) {
             detailsDiv.innerHTML = '<div id="spinner"><div class="spinner-border text-primary" role="status"></div></div>';
 
@@ -152,65 +181,64 @@
                 })
                 .then(data => {
                     const food = data.food;
-
-                    // pick your serving object
                     let s = food.servings.serving;
                     if (Array.isArray(s)) s = s[0];
 
-                    // build the nutrient rows
-                    const rows = [
-                        ['Calories', s.calories + ' kcal'],
-                        ['Fat', s.fat + ' g'],
-                        ['Sat. Fat', s.saturated_fat + ' g'],
-                        ['Trans Fat', s.trans_fat + ' g'],
-                        ['Carbs', s.carbohydrate + ' g'],
-                        ['Fiber', s.fiber + ' g'],
-                        ['Protein', s.protein + ' g'],
-                        ['Cholesterol', s.cholesterol + ' mg'],
-                        ['Sodium', s.sodium + ' mg'],
-                        ['Sugar', s.sugar + ' g']
-                    ].map(([nutrient, value]) =>
-                        `<tr><td>${nutrient}</td><td>${value}</td></tr>`
-                    ).join('');
+                    // 1) Nutrient definitions: [Display label, property key, unit]
+                    const nutrientDefs = [
+                        ['Calories', 'calories', 'kcal'],
+                        ['Fat', 'fat', 'g'],
+                        ['Saturated Fat', 'saturated_fat', 'g'],
+                        ['Trans Fat', 'trans_fat', 'g'],
+                        ['Poly Fat', 'polyunsaturated_fat', 'g'],
+                        ['Mono Fat', 'monounsaturated_fat', 'g'],
+                        ['Carbs', 'carbohydrate', 'g'],
+                        ['Fiber', 'fiber', 'g'],
+                        ['Protein', 'protein', 'g'],
+                        ['Cholesterol', 'cholesterol', 'mg'],
+                        ['Sodium', 'sodium', 'mg'],
+                        ['Sugar', 'sugar', 'g'],
+                        ['Calcium', 'calcium', 'mg'],
+                        ['Potassium', 'potassium', 'mg'],
+                        ['Iron', 'iron', 'mg']
+                    ];
 
-                    // render the card with <img> only here
+                    // 2) Build rows, defaulting to "-" if the raw value is null/undefined
+                    const rows = nutrientDefs.map(([label, key, unit]) => {
+                        const raw = s[key];
+                        const display = raw != null
+                            ? `${raw} ${unit}`
+                            : '–';
+                        return `<tr><td>${label}</td><td>${display}</td></tr>`;
+                    }).join('');
+
+                    // 3) Render the card (image code omitted for brevity)
                     detailsDiv.innerHTML = `
-          <div class="card">
-            <div class="card-body">
-              <h3 class="card-title">${food.food_name}</h3>
-              <h6 class="card-subtitle text-muted mb-3">
-                ${food.brand_name ? food.brand_name : (food.food_type || 'Generic')}
-              </h6>
-              <p><strong>Serving:</strong> ${s.serving_description}
-                 (${s.metric_serving_amount} ${s.metric_serving_unit})</p>
-              <div class="table-responsive">
-                <table class="table table-sm"><tbody>${rows}</tbody></table>
-              </div>
-              <button id="addMealBtn" class="btn btn-primary mt-2">
-                Add to Meal
-              </button>
+        <div class="card">
+          <div class="card-body">
+            <h3 class="card-title">${food.food_name}</h3>
+            <h6 class="card-subtitle text-muted mb-3">
+              ${food.brand_name || food.food_type || 'Generic'}
+            </h6>
+            <p><strong>Serving:</strong> ${s.serving_description}
+               (${s.metric_serving_amount} ${s.metric_serving_unit})</p>
+            <div class="table-responsive">
+              <table class="table table-sm"><tbody>${rows}</tbody></table>
             </div>
-          </div>`;
+            <button id="addMealBtn" class="btn btn-primary mt-2">
+              Add to Meal
+            </button>
+          </div>
+        </div>`;
 
-                    // show modal on button click
-                    document.getElementById('addMealBtn').onclick = () => {
-                        mealFoodId.value = food.food_id;
-                        modal.show();
-                    };
-
-                    // scroll into view
-                    detailsDiv.scrollIntoView({behavior: 'smooth', block: 'start'});
+                    // …rest of your modal wiring and scrollIntoView…
                 })
                 .catch(err => {
-                    console.error(err);
-                    detailsDiv.innerHTML = `
-          <div class="alert alert-danger">
-            Unable to load details: ${err.message}
-          </div>`;
+                    detailsDiv.innerHTML = `<div class="alert alert-danger">Unable to load details: ${err.message}</div>`;
                 });
         }
 
-        // 4) Add‐to‐meal handler (unchanged)
+        // Add-to-meal handler
         mealForm.onsubmit = e => {
             e.preventDefault();
             const payload = {
