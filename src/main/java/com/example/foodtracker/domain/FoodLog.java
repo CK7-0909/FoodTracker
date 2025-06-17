@@ -81,6 +81,15 @@ public class FoodLog {
     @Column(precision = 10, scale = 3)
     private BigDecimal monounsaturatedFat;
 
+    @Column(precision = 10, scale = 3)
+    private BigDecimal vitaminA;
+
+    @Column(precision = 10, scale = 3)
+    private BigDecimal vitaminC;
+
+    @Column(precision = 10, scale = 3)
+    private BigDecimal vitaminD;
+
     public FoodLog() {
     }
 
@@ -89,7 +98,8 @@ public class FoodLog {
                    BigDecimal calories, BigDecimal fat, BigDecimal saturatedFat, BigDecimal transFat,
                    BigDecimal carbs, BigDecimal fiber, BigDecimal protein, BigDecimal cholesterol,
                    BigDecimal sodium, BigDecimal sugar, BigDecimal servingSize, BigDecimal servings, String brandName,
-                   BigDecimal calcium, BigDecimal iron, BigDecimal potassium, BigDecimal polyunsaturatedFat, BigDecimal monounsaturatedFat) {
+                   BigDecimal calcium, BigDecimal iron, BigDecimal potassium, BigDecimal polyunsaturatedFat, BigDecimal monounsaturatedFat,
+                   BigDecimal vitaminA, BigDecimal vitaminC, BigDecimal vitaminD) {
         this.userId = userId;
         this.fdcId = fdcId;
         this.mealType = mealType;
@@ -111,6 +121,9 @@ public class FoodLog {
         this.potassium = potassium;
         this.polyunsaturatedFat = polyunsaturatedFat;
         this.monounsaturatedFat = monounsaturatedFat;
+        this.vitaminA = vitaminA;
+        this.vitaminC = vitaminC;
+        this.vitaminD = vitaminD;
     }
 
     public long getId() {
@@ -295,5 +308,29 @@ public class FoodLog {
 
     public void setMonounsaturatedFat(BigDecimal monounsaturatedFat) {
         this.monounsaturatedFat = monounsaturatedFat;
+    }
+
+    public BigDecimal getVitaminA() {
+        return vitaminA;
+    }
+
+    public void setVitaminA(BigDecimal vitaminA) {
+        this.vitaminA = vitaminA;
+    }
+
+    public BigDecimal getVitaminC() {
+        return vitaminC;
+    }
+
+    public void setVitaminC(BigDecimal vitaminC) {
+        this.vitaminC = vitaminC;
+    }
+
+    public BigDecimal getVitaminD() {
+        return vitaminD;
+    }
+
+    public void setVitaminD(BigDecimal vitaminD) {
+        this.vitaminD = vitaminD;
     }
 }

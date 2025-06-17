@@ -1,8 +1,8 @@
 package com.example.foodtracker.service;
 
 import com.example.foodtracker.Repository.FoodLogRepository;
-import com.example.foodtracker.dto.MacroHistoryDto;
 import com.example.foodtracker.dto.MacroSummaryDto;
+import com.example.foodtracker.dto.MicroSummaryDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +27,7 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    public List<MacroHistoryDto> getMacroHistory(int userId, String period) {
+    public List<MicroSummaryDto> getMacroHistory(int userId, String period) {
         return List.of();
     }
 

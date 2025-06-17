@@ -79,6 +79,9 @@ public class FoodLogService {
         log.setPotassium(getAsBigDecimal(s, "potassium"));
         log.setPolyunsaturatedFat(getAsBigDecimal(s, "polyunsaturated_fat"));
         log.setMonounsaturatedFat(getAsBigDecimal(s, "monounsaturated_fat"));
+        log.setVitaminA(getAsBigDecimal(s, "vitamin_a"));
+        log.setVitaminC(getAsBigDecimal(s, "vitamin_c"));
+        log.setVitaminD(getAsBigDecimal(s, "vitamin_d"));
 
         // 5) Persist it
         repo.logFood(log);
