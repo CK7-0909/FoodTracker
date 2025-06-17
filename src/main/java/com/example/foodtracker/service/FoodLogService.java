@@ -74,6 +74,11 @@ public class FoodLogService {
         log.setCholesterol(getAsBigDecimal(s, "cholesterol"));
         log.setSodium(getAsBigDecimal(s, "sodium"));
         log.setSugar(getAsBigDecimal(s, "sugar"));
+        log.setCalcium(getAsBigDecimal(s, "calcium"));
+        log.setIron(getAsBigDecimal(s, "iron"));
+        log.setPotassium(getAsBigDecimal(s, "potassium"));
+        log.setPolyunsaturatedFat(getAsBigDecimal(s, "polyunsaturated_fat"));
+        log.setMonounsaturatedFat(getAsBigDecimal(s, "monounsaturated_fat"));
 
         // 5) Persist it
         repo.logFood(log);
