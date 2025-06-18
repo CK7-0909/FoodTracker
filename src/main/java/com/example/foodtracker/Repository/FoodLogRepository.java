@@ -73,7 +73,16 @@ public class FoodLogRepository {
                 SELECT
                   COALESCE(SUM(protein), 0) AS protein,
                   COALESCE(SUM(carbs), 0) AS carbs,
-                  COALESCE(SUM(fat), 0) AS fat
+                  COALESCE(SUM(fat), 0) AS fat,
+                  COALESCE(SUM(fiber), 0) AS fiber,
+                  COALESCE(SUM(cholesterol), 0) AS cholesterol,
+                  COALESCE(SUM(sodium), 0) AS sodium,
+                  COALESCE(SUM(sugar), 0) AS sugar,
+                  COALESCE(SUM(calcium), 0) AS calcium,
+                  COALESCE(SUM(potassium), 0) AS potassium,
+                  COALESCE(SUM(vitamin_a), 0) AS vitaminA,
+                  COALESCE(SUM(vitamin_c), 0) AS vitaminC,
+                  COALESCE(SUM(vitamin_d), 0) AS vitaminD
                 FROM foodlog
                 WHERE user_id = ? AND logged_at >= ? AND logged_at < ?
                 """;
@@ -96,7 +105,10 @@ public class FoodLogRepository {
                   COALESCE(SUM(sugar), 0) AS sugar,
                   COALESCE(SUM(calcium), 0) AS calcium,
                   COALESCE(SUM(potassium), 0) AS potassium,
-                  COALESCE(SUM(iron), 0) AS iron
+                  COALESCE(SUM(vitamin_a), 0) AS vitaminA,
+                  COALESCE(SUM(vitamin_c), 0) AS vitaminC,
+                  COALESCE(SUM(vitamin_d), 0) AS vitaminD
+                
                 FROM foodlog
                 WHERE user_id = ? AND logged_at >= ? AND logged_at < ?
                 """;

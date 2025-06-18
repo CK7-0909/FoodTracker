@@ -10,6 +10,9 @@ public class MicroSummaryDto {
     private BigDecimal calcium;
     private BigDecimal potassium;
     private BigDecimal iron;
+    private BigDecimal vitaminA;
+    private BigDecimal vitaminC;
+    private BigDecimal vitaminD;
 
     public BigDecimal getFiber() {
         return fiber;
@@ -65,5 +68,29 @@ public class MicroSummaryDto {
 
     public void setIron(BigDecimal iron) {
         this.iron = iron;
+    }
+
+    public BigDecimal getVitaminA() {
+        return vitaminA;
+    }
+
+    public void setVitaminA(BigDecimal vitaminA) {
+        this.vitaminA = vitaminA;
+    }
+
+    public BigDecimal getVitaminC() {
+        return vitaminC;
+    }
+
+    public void setVitaminC(BigDecimal vitaminC) {
+        this.vitaminC = vitaminC;
+    }
+
+    public BigDecimal getVitaminD() {
+        return vitaminD;
+    }
+
+    public void setVitaminD(BigDecimal vitaminD) {
+        this.vitaminD = vitaminD;
     }
 }

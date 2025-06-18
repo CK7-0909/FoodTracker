@@ -62,58 +62,108 @@
             </table>
         </div>
     </div>
+
+    <!-- SecondaryPie + Table row -->
+    <div class="row">
+        <!-- Pie chart column -->
+        <div class="col-md-6 d-flex justify-content-center align-items-center">
+            <div id="chartWrap" style="width:300px; height:300px;">
+                <canvas id="secondaryChart"></canvas>
+            </div>
+        </div>
+        <!-- Secondary table column -->
+        <div class="col-md-6">
+            <table class="table table-bordered table-sm">
+                <thead class="table-light">
+                <tr>
+                    <th>Secondary Nutrients</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Fiber</td>
+                    <td class="text-end" id="tblFiber">0</td>
+                </tr>
+                <tr>
+                    <td>Cholesterol</td>
+                    <td class="text-end" id="tblCholesterol">0</td>
+                </tr>
+                <tr>
+                    <td>Sodium</td>
+                    <td class="text-end" id="tblSodium">0</td>
+                </tr>
+                <tr>
+                    <td>Sugar</td>
+                    <td class="text-end" id="tblSugar">0</td>
+                </tr>
+                <tr>
+                    <td>Potassium</td>
+                    <td class="text-end" id="tblPotassium">0</td>
+                </tr>
+                <tr>
+                    <td>Calcium</td>
+                    <td class="text-end" id="tblCalcium">0</td>
+                </tr>
+                <tr>
+                    <td>Iron</td>
+                    <td class="text-end" id="tblIron">0</td>
+                </tr>
+                <tr>
+                    <td>Vitamin A</td>
+                    <td class="text-end" id="tblVitaminA">0</td>
+                </tr>
+                <tr>
+                    <td>Vitamin C</td>
+                    <td class="text-end" id="tblVitaminC">0</td>
+                </tr>
+                <tr>
+                    <td>Vitamin D</td>
+                    <td class="text-end" id="tblVitaminD">0</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // 1) Grab the canvas and table cells
-        const ctx = document.getElementById('macroChart').getContext('2d');
-        let chart;
+        // 1) Canvas contexts + chart handles
+        const ctx1 = document.getElementById('macroChart').getContext('2d');
+        const ctx2 = document.getElementById('secondaryChart').getContext('2d');
+        let macroChart, secondaryChart;
 
+        // 2) Date inputs + defaults
         const startInput = document.getElementById('startDate');
         const endInput = document.getElementById('endDate');
-
-        // 2) Compute defaults (one month ago → today)
         const today = new Date();
         const oneMonthAgo = new Date(today);
         oneMonthAgo.setMonth(today.getMonth() - 1);
-
         const fmt = d => d.toISOString().slice(0, 10);
         const defaultStart = fmt(oneMonthAgo);
         const defaultEnd = fmt(today);
-
-        // 3) Seed the inputs if empty
         if (!startInput.value) startInput.value = defaultStart;
         if (!endInput.value) endInput.value = defaultEnd;
 
-        // 4) The loader
+        // 3) Main loader
         function loadData() {
             const start = startInput.value || defaultStart;
             const end = endInput.value || defaultEnd;
-
-            console.log('Loading data for', start, '→', end);
-
-            // make sure your controller expects 'start' and 'end'
             fetch(`/macroSummaryChart?start=${start}&end=${end}`)
-                .then(resp => {
-                    console.log('Response status:', resp.status);
-                    if (!resp.ok) {
-                        throw new Error(`Server returned ${resp.status}`);
-                    }
-                    return resp.json();
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                    return r.json();
                 })
                 .then(data => {
-                    console.log('Summary JSON:', data);
+                    // 4) Primary macros
+                    const protein = data.protein ?? 0;
+                    const carbs = data.carbs ?? 0;
+                    const fat = data.fat ?? 0;
 
-                    // pick the right keys from your JSON shape:
-                    const protein = data.totalProtein ?? data.protein ?? 0;
-                    const carbs = data.totalCarbs ?? data.carbs ?? 0;
-                    const fat = data.totalFat ?? data.fat ?? 0;
-
-                    // redraw pie
-                    const cfg = {
+                    const cfg1 = {
                         type: 'pie',
                         data: {
                             labels: ['Protein', 'Carbs', 'Fat'],
@@ -122,30 +172,80 @@
                                 backgroundColor: ['#0d6efd', '#198754', '#dc3545']
                             }]
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
+                        options: {responsive: true, maintainAspectRatio: false}
                     };
-                    if (chart) chart.destroy();
-                    chart = new Chart(ctx, cfg);
+                    if (macroChart) macroChart.destroy();
+                    macroChart = new Chart(ctx1, cfg1);
 
-                    // update table
                     document.getElementById('tblProtein').textContent = protein;
                     document.getElementById('tblCarbs').textContent = carbs;
                     document.getElementById('tblFat').textContent = fat;
+
+                    // 5) Secondary nutrients
+                    const fiber = data.fiber ?? 0;
+                    const cholesterol = data.cholesterol ?? 0;
+                    const sodium = data.sodium ?? 0;
+                    const sugar = data.sugar ?? 0;
+                    const potassium = data.potassium ?? 0;
+                    const calcium = data.calcium ?? 0;
+                    const iron = data.iron ?? 0;
+                    const vitaminA = data.vitaminA ?? 0;  // in µg
+                    const vitaminC = data.vitaminC ?? 0;
+                    const vitaminD = data.vitaminD ?? 0;  // in µg
+
+                    // if you want to convert µg→mg for chart proportions:
+                    const vitA_mg = vitaminA / 1000;
+                    const vitD_mg = vitaminD / 1000;
+
+                    const cfg2 = {
+                        type: 'pie',
+                        data: {
+                            labels: [
+                                'Fiber', 'Cholesterol', 'Sodium', 'Sugar', 'Potassium',
+                                'Calcium', 'Iron', 'Vitamin A (mcg)', 'Vitamin C', 'Vitamin D (mcg)'
+                            ],
+                            datasets: [{
+                                data: [
+                                    fiber,
+                                    cholesterol,
+                                    sodium,
+                                    sugar,
+                                    potassium,
+                                    calcium,
+                                    iron,
+                                    vitA_mg,
+                                    vitaminC,
+                                    vitD_mg
+                                ],
+                                backgroundColor: [
+                                    '#0d6efd', '#198754', '#dc3545', '#fd7e14', '#6f42c1',
+                                    '#0dcaf0', '#ffc107', '#d63384', '#20c997', '#adb5bd'
+                                ]
+                            }]
+                        },
+                        options: {responsive: true, maintainAspectRatio: false}
+                    };
+                    if (secondaryChart) secondaryChart.destroy();
+                    secondaryChart = new Chart(ctx2, cfg2);
+
+                    // 6) Update secondary table
+                    document.getElementById('tblFiber').textContent = fiber;
+                    document.getElementById('tblCholesterol').textContent = cholesterol;
+                    document.getElementById('tblSodium').textContent = sodium;
+                    document.getElementById('tblSugar').textContent = sugar;
+                    document.getElementById('tblPotassium').textContent = potassium;
+                    document.getElementById('tblCalcium').textContent = calcium;
+                    document.getElementById('tblIron').textContent = iron;
+                    document.getElementById('tblVitaminA').textContent = `${vitA_mg.toFixed(3)} mg`;
+                    document.getElementById('tblVitaminC').textContent = vitaminC;
+                    document.getElementById('tblVitaminD').textContent = `${vitD_mg.toFixed(3)} mg`;
                 })
-                .catch(err => {
-                    console.error('Error loading macro summary:', err);
-                    // optionally: show an alert on the page
-                });
+                .catch(console.error);
         }
 
-        // 5) Wire up change events
+        // 7) Wire up + initial
         startInput.addEventListener('change', loadData);
         endInput.addEventListener('change', loadData);
-
-        // 6) Initial fetch
         loadData();
     });
 </script>

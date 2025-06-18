@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class DashboardService {
@@ -27,8 +26,10 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    public List<MicroSummaryDto> getMacroHistory(int userId, String period) {
-        return List.of();
+    public MicroSummaryDto getMicroSummary(int userId, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+        return foodLogRepository.getMicroSummary(userId, start, end);
     }
 
 }

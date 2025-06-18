@@ -56,15 +56,32 @@ public class DashController {
         return ResponseEntity.ok(summary);
     }
 
-//    @GetMapping("/macroSummaryChartTable")
-//    public ResponseEntity<List<MacroHistoryDto>> macroHistory(@RequestParam(required = false) String start,
-//                                                              @RequestParam(required = false) String end,
-//                                                              Authentication auth) throws JsonProcessingException {
+//    @GetMapping("/macroSummaryChart")
+//    public ResponseEntity<MicroSummaryDto> microSummary(@RequestParam(required = false)
+//                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+//                                                        LocalDate start,
+//
+//                                                        @RequestParam(required = false)
+//                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+//                                                        LocalDate end,
+//                                                        Authentication auth) {
 //        User user = userRepository.getUserByEmail(auth.getName())
 //                .orElseThrow(() -> new UsernameNotFoundException("No User"));
-//        LocalDate startDate = start != null ? LocalDate.parse(start): LocalDate.now();
-//        LocalDate endDate = end != null ? LocalDate.parse(end): LocalDate.now();
-//        List<MacroHistoryDto> history = dashboardService.getMacroSummary(user.getId(), startDate, endDate);
-//        return ResponseEntity.ok(history);
+//        LocalDate actualEnd = end != null
+//                ? end
+//                : LocalDate.now();
+//
+//        LocalDate actualStart = start != null
+//                ? start
+//                : actualEnd.minusMonths(1);
+//
+//        if (actualStart.isAfter(actualEnd)) {
+//            throw new ResponseStatusException(
+//                    HttpStatus.BAD_REQUEST,
+//                    "start date must be on or before end date"
+//            );
+//        }
+//        MicroSummaryDto summary = dashboardService.getMicroSummary(user.getId(), actualStart, actualEnd);
+//        return ResponseEntity.ok(summary);
 //    }
 }
