@@ -66,6 +66,30 @@ public class FoodLog {
     @Column(precision = 10, scale = 3)
     private BigDecimal sugar;
 
+    @Column(precision = 10, scale = 3)
+    private BigDecimal calcium;
+
+    @Column(precision = 10, scale = 3)
+    private BigDecimal iron;
+
+    @Column(precision = 10, scale = 3)
+    private BigDecimal potassium;
+
+    @Column(precision = 10, scale = 3)
+    private BigDecimal polyunsaturatedFat;
+
+    @Column(precision = 10, scale = 3)
+    private BigDecimal monounsaturatedFat;
+
+    @Column(precision = 10, scale = 3)
+    private BigDecimal vitaminA;
+
+    @Column(precision = 10, scale = 3)
+    private BigDecimal vitaminC;
+
+    @Column(precision = 10, scale = 3)
+    private BigDecimal vitaminD;
+
     public FoodLog() {
     }
 
@@ -73,7 +97,9 @@ public class FoodLog {
     public FoodLog(Long userId, int fdcId, String mealType,
                    BigDecimal calories, BigDecimal fat, BigDecimal saturatedFat, BigDecimal transFat,
                    BigDecimal carbs, BigDecimal fiber, BigDecimal protein, BigDecimal cholesterol,
-                   BigDecimal sodium, BigDecimal sugar, BigDecimal servingSize, BigDecimal servings, String brandName) {
+                   BigDecimal sodium, BigDecimal sugar, BigDecimal servingSize, BigDecimal servings, String brandName,
+                   BigDecimal calcium, BigDecimal iron, BigDecimal potassium, BigDecimal polyunsaturatedFat, BigDecimal monounsaturatedFat,
+                   BigDecimal vitaminA, BigDecimal vitaminC, BigDecimal vitaminD) {
         this.userId = userId;
         this.fdcId = fdcId;
         this.mealType = mealType;
@@ -90,6 +116,14 @@ public class FoodLog {
         this.servingSize = servingSize;
         this.servings = servings;
         this.brandName = brandName;
+        this.calcium = calcium;
+        this.iron = iron;
+        this.potassium = potassium;
+        this.polyunsaturatedFat = polyunsaturatedFat;
+        this.monounsaturatedFat = monounsaturatedFat;
+        this.vitaminA = vitaminA;
+        this.vitaminC = vitaminC;
+        this.vitaminD = vitaminD;
     }
 
     public long getId() {
@@ -234,5 +268,69 @@ public class FoodLog {
 
     public void setServings(BigDecimal servings) {
         this.servings = servings;
+    }
+
+    public BigDecimal getCalcium() {
+        return calcium;
+    }
+
+    public void setCalcium(BigDecimal calcium) {
+        this.calcium = calcium;
+    }
+
+    public BigDecimal getIron() {
+        return iron;
+    }
+
+    public void setIron(BigDecimal iron) {
+        this.iron = iron;
+    }
+
+    public BigDecimal getPolyunsaturatedFat() {
+        return polyunsaturatedFat;
+    }
+
+    public void setPolyunsaturatedFat(BigDecimal polyunsaturatedFat) {
+        this.polyunsaturatedFat = polyunsaturatedFat;
+    }
+
+    public BigDecimal getPotassium() {
+        return potassium;
+    }
+
+    public void setPotassium(BigDecimal potassium) {
+        this.potassium = potassium;
+    }
+
+    public BigDecimal getMonounsaturatedFat() {
+        return monounsaturatedFat;
+    }
+
+    public void setMonounsaturatedFat(BigDecimal monounsaturatedFat) {
+        this.monounsaturatedFat = monounsaturatedFat;
+    }
+
+    public BigDecimal getVitaminA() {
+        return vitaminA;
+    }
+
+    public void setVitaminA(BigDecimal vitaminA) {
+        this.vitaminA = vitaminA;
+    }
+
+    public BigDecimal getVitaminC() {
+        return vitaminC;
+    }
+
+    public void setVitaminC(BigDecimal vitaminC) {
+        this.vitaminC = vitaminC;
+    }
+
+    public BigDecimal getVitaminD() {
+        return vitaminD;
+    }
+
+    public void setVitaminD(BigDecimal vitaminD) {
+        this.vitaminD = vitaminD;
     }
 }

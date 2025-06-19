@@ -26,7 +26,7 @@ public class UserRepository {
             User user = jdbcTemplate.queryForObject(sql, new Object[]{email}, new BeanPropertyRowMapper<>(User.class));
             return Optional.of(user);
         } catch (EmptyResultDataAccessException e) {
-            return null;  // Return null if no user found
+            return Optional.empty();  // Return null if no user found
         }
     }
 

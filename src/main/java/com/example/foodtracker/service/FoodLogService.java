@@ -74,6 +74,14 @@ public class FoodLogService {
         log.setCholesterol(getAsBigDecimal(s, "cholesterol"));
         log.setSodium(getAsBigDecimal(s, "sodium"));
         log.setSugar(getAsBigDecimal(s, "sugar"));
+        log.setCalcium(getAsBigDecimal(s, "calcium"));
+        log.setIron(getAsBigDecimal(s, "iron"));
+        log.setPotassium(getAsBigDecimal(s, "potassium"));
+        log.setPolyunsaturatedFat(getAsBigDecimal(s, "polyunsaturated_fat"));
+        log.setMonounsaturatedFat(getAsBigDecimal(s, "monounsaturated_fat"));
+        log.setVitaminA(getAsBigDecimal(s, "vitamin_a"));
+        log.setVitaminC(getAsBigDecimal(s, "vitamin_c"));
+        log.setVitaminD(getAsBigDecimal(s, "vitamin_d"));
 
         // 5) Persist it
         repo.logFood(log);
@@ -103,4 +111,5 @@ public class FoodLogService {
         //System.out.println(foodLogs);
         return foodLogs;
     }
+
 }
