@@ -40,4 +40,9 @@ public class WebController {
     public String LogRetrieval() {
         return "logRetrieval";
     }
+
+    @GetMapping("/recommendations")
+    public String Recommendations() {
+        return "recommendations";
+    }
 }
