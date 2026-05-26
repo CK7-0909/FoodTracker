@@ -2,6 +2,7 @@ package com.example.foodtracker.API;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -66,6 +67,11 @@ public class FatSecretAPI {
 
         String url = apiUrl + "?method=foods.search&search_expression=" + query + "&format=json";
 
+        return getStringObjectMap(headers, url);
+    }
+
+    @Nullable
+    private Map<String, Object> getStringObjectMap(HttpHeaders headers, String url) {
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
         ResponseEntity<Map> response = restTemplate.exchange(
@@ -91,19 +97,6 @@ public class FatSecretAPI {
 
         String url = apiUrl + "?method=food.get.v2" + "&food_id=" + id + "&format=json";
 
-        HttpEntity<Void> request = new HttpEntity<>(headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                request,
-                Map.class
-        );
-
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Failed to search foods: " + response.getStatusCode());
-        }
+        return getStringObjectMap(headers, url);
     }
 }

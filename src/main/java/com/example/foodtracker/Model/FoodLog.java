@@ -1,4 +1,4 @@
-package com.example.foodtracker.domain;
+package com.example.foodtracker.Model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;

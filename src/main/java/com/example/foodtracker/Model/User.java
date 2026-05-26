@@ -1,4 +1,4 @@
-package com.example.foodtracker.domain;
+package com.example.foodtracker.Model;
 
 
 public class User {
