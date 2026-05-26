@@ -1,14 +1,14 @@
 package com.example.foodtracker.Controller;
 
-import com.example.foodtracker.domain.User;
+import com.example.foodtracker.Model.User;
 import com.example.foodtracker.service.UserService;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@RestController
-// @RequestMapping("/user")
+@Controller
 public class UserController {
 
     private final UserService userService;
@@ -18,7 +18,8 @@ public class UserController {
     }
 
     @GetMapping("/getByUserEmail")
-    public User getByUserId(@RequestParam String email) {
+    @ResponseBody
+    public User getByUserEmail(@RequestParam String email) {
         return userService.getUserByEmail(email);
     }
 
@@ -26,16 +27,15 @@ public class UserController {
     public String registerUser(@RequestParam String email, @RequestParam String password) {
         try {
             userService.registerUser(email, password);
-            return "redirect:/login";  // Redirect to login page after successful registration
+            return "redirect:/login";
         } catch (IllegalArgumentException e) {
-            // If user already exists or email is invalid
-            return "redirect:/register";  // You can redirect with an error message
+            return "redirect:/register";
         }
     }
 
     @GetMapping("/test")
+    @ResponseBody
     public String test() {
         return "API is working!";
     }
 }
-// Spring security password 60e53d06-1890-4728-86f4-b51f6ca657a6 and username is user and it's basic auth

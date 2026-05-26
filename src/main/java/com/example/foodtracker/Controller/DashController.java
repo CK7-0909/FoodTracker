@@ -1,7 +1,7 @@
 package com.example.foodtracker.Controller;
 
 import com.example.foodtracker.Repository.UserRepository;
-import com.example.foodtracker.domain.User;
+import com.example.foodtracker.Model.User;
 import com.example.foodtracker.dto.MacroSummaryDto;
 import com.example.foodtracker.service.DashboardService;
 import org.springframework.format.annotation.DateTimeFormat;

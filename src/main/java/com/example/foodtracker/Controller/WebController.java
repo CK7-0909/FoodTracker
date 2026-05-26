@@ -6,43 +6,43 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class WebController {
 
-    @GetMapping({"/about"})
-    public String About() {
+    @GetMapping("/about")
+    public String about() {
         return "about";
     }
 
     @GetMapping("/login")
-    public String Login() {
+    public String login() {
         return "login";
     }
 
     @GetMapping("/register")
-    public String Register() {
+    public String register() {
         return "register";
     }
 
     @GetMapping("/index")
-    public String Index() {
+    public String index() {
         return "index";
     }
 
     @GetMapping("/error")
-    public String Error() {
+    public String error() {
         return "error";
     }
 
     @GetMapping("/dashboard")
-    public String Dashboard() {
+    public String dashboard() {
         return "dashboard";
     }
 
     @GetMapping("/logRetrieval")
-    public String LogRetrieval() {
+    public String logRetrieval() {
         return "logRetrieval";
     }
 
     @GetMapping("/recommendations")
-    public String Recommendations() {
+    public String recommendations() {
         return "recommendations";
     }
 }

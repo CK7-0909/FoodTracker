@@ -2,13 +2,12 @@ package com.example.foodtracker.service;
 
 import com.example.foodtracker.API.FatSecretAPI;
 import com.example.foodtracker.Repository.FoodLogRepository;
-import com.example.foodtracker.domain.FoodLog;
+import com.example.foodtracker.Model.FoodLog;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -104,12 +103,9 @@ public class FoodLogService {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<FoodLog> getFoodLogs(int userId) {
-        List<FoodLog> foodLogs = new ArrayList<>();
-        foodLogs = repo.getFoodLogsByUser(userId);
-        //System.out.println(foodLogs);
-        return foodLogs;
+        return repo.getFoodLogsByUser(userId);
     }
 
 }

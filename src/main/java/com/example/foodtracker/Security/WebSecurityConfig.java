@@ -1,7 +1,7 @@
 package com.example.foodtracker.Security;
 
 import com.example.foodtracker.Repository.UserRepository;
-import com.example.foodtracker.domain.User;
+import com.example.foodtracker.Model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -72,21 +72,15 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Custom UserDetailsService for authentication
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         return email -> {
-            Optional<User> userDetail = userRepository.getUserByEmail(email); // Use UserRepository here
-            if (userDetail.isEmpty()) {
-                throw new UsernameNotFoundException("User not found");
-            }
-            User user = userDetail
+            User user = userRepository.getUserByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             return org.springframework.security.core.userdetails.User.builder()
                     .username(user.getEmail())
                     .password(user.getPassword())
                     .build();
-
         };
     }
 

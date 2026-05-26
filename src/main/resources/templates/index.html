@@ -152,7 +152,11 @@
             fetch(`/searchFat?query=${encodeURIComponent(term)}`)
                 .then(r => r.json())
                 .then(data => {
-                    const items = data.foods?.food || [];
+                    // FatSecret JSON wraps results under foods_search.foods.food (not root foods.food)
+                    const raw = data?.foods_search?.foods?.food
+                        ?? data?.foods?.food
+                        ?? data?.results?.food;
+                    const items = raw == null ? [] : (Array.isArray(raw) ? raw : [raw]);
                     if (!items.length) {
                         resultDiv.innerHTML = '<div class="alert alert-info">No fats found.</div>';
                         return;
