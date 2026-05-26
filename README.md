@@ -59,7 +59,7 @@ Create the local database before starting the app:
 CREATE DATABASE foodtracker;
 ```
 
-Secrets are imported from `src/main/resources/application-secrets.properties`. Keep real secrets out of commits. The file should provide values for the placeholders used in `application.properties`, for example:
+Secrets are imported from `src/main/resources/application-secrets.properties`. Keep real secrets out of commits; this file is listed in `.gitignore` and should stay local. Use `src/main/resources/application-secrets.example.properties` as a template and create your own local `application-secrets.properties` with values for the placeholders used in `application.properties`, for example:
 
 ```properties
 DB_USERNAME=your_mysql_username
